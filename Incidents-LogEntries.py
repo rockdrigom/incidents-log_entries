@@ -7,7 +7,7 @@
 ### OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 ### THE SOFTWARE.
 
-### This code gets all  & alerts for every incident
+### This code gets all incidents and its log entries
 
 from pdpyras import APISession
 import pandas as pd
@@ -19,7 +19,7 @@ session = APISession(API_ACCESS_KEY)
 list_incidents = pd.DataFrame()
 list_log_entries = pd.DataFrame()
 offset = 0
-days_to_get = 1  # three months Data
+days_to_get = 1  # select number of days to get
 today = datetime.today()
 start_date = today - relativedelta(days=int(days_to_get - 1))
 # declare the days that you want to go back asking for incidents
