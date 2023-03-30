@@ -14,7 +14,7 @@ import pandas as pd
 from datetime import datetime, timedelta
 from dateutil.relativedelta import *
 
-API_ACCESS_KEY = 'YOU API KEY HERE'
+API_ACCESS_KEY = 'YOUR API KEY HERE'
 
 session = APISession(API_ACCESS_KEY)
 list_incidents = pd.DataFrame()
