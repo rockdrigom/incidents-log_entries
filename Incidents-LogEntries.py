@@ -7,19 +7,20 @@
 ### OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 ### THE SOFTWARE.
 
-### This code gets all incidents and its log entries
+### This code gets all  & alerts for every incident
 
 from pdpyras import APISession
 import pandas as pd
 from datetime import datetime, timedelta
 from dateutil.relativedelta import *
 
-API_ACCESS_KEY = 'YOUR API KEY HERE'
+API_ACCESS_KEY = 'YOU API KEY HERE'
+
 session = APISession(API_ACCESS_KEY)
 list_incidents = pd.DataFrame()
 list_log_entries = pd.DataFrame()
 offset = 0
-days_to_get = 1  # select number of days to get
+days_to_get = 2  # three months Data
 today = datetime.today()
 start_date = today - relativedelta(days=int(days_to_get - 1))
 # declare the days that you want to go back asking for incidents
@@ -45,11 +46,23 @@ for x in range(days_to_get):
         list_incidents = pd.concat([list_incidents, dataframe_incidents], ignore_index=True, axis=0)
 print(len(list_incidents))
 
+offset = 0
 for s in range(len(list_incidents)):
-    response = session.get("/incidents/" + str(list_incidents.id[s]) + "/log_entries?is_overview=false")
+    print(str(list_incidents.id[s]))
+    response = session.get("/incidents/" + str(list_incidents.id[s]) + "/log_entries?is_overview=true&limit=100&offset=" + str(offset))
     dataframe_log_entries = pd.json_normalize(response.json()["log_entries"], max_level=None)
     dataframe_log_entries["IncidentID"] = list_incidents.id[s]
     list_log_entries = pd.concat([list_log_entries, dataframe_log_entries], ignore_index=True, axis=0)
+
+    while response.json()["more"] and offset < 9900:  # more than 10.000 record would fail
+        limit = response.json()["limit"]
+        offset = offset + int(limit)
+        response = session.get(
+            "/incidents/" + str(list_incidents.id[s]) + "/log_entries?is_overview=true&limit=100&offset=" + str(
+                offset))
+        dataframe_log_entries = pd.json_normalize(response.json()["log_entries"], max_level=None)
+        dataframe_log_entries["IncidentID"] = list_incidents.id[s]
+        list_log_entries = pd.concat([list_log_entries, dataframe_log_entries], ignore_index=True, axis=0)
 
 
 print(list_incidents)
